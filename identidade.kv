@@ -1,0 +1,16 @@
+Manager:
+    Game:
+        name: 'game'
+
+<Player>:
+    source: 'ball.png'
+
+<Game>:
+    MDFloatLayout:
+        Player:
+            id: player
+            allow_stretch: True
+            size_hint: None, None
+            size: root.height/20, root.height/20
+            x: root.width/1.25
+            y: root.height/20
