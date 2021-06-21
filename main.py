@@ -43,7 +43,7 @@ class Game(Screen):
         player.speed_x = 500
 
     def update(self, *args):
-        player.speed_y += -self.height * 3 * 1 / 30
+        player.speed_y += -self.height * 4 * 1 / 30
         player.y += player.speed_y * 1 / 30
         player.x -= player.speed_x * 1 / 30
         if not 0 < player.y < self.height or not 0 < player.x < self.width:
