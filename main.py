@@ -23,10 +23,10 @@ class Game(Screen):
 
     def on_enter(self, *args):
         Clock.schedule_interval(self.update, 1/30)
-        Clock.schedule_interval(self.put_obstacle, 1)
+        Clock.schedule_interval(self.put_obstacle, 2)
 
     def put_obstacle(self, *args):
-        gap = self.width / 3
+        gap = self.width / 2
         position = (self.width - gap) * random()
         height = self.height * 0.05
         obstacle_left = Obstacle(y=self.height, width=position, height=height)
@@ -46,7 +46,7 @@ class Game(Screen):
         player.speed_y += -self.height * 4 * 1 / 30
         player.y += player.speed_y * 1 / 30
         player.x -= player.speed_x * 1 / 30
-        if not 0 < player.y < self.height or not 0 < player.x < self.width:
+        if not 0 < player.y < self.height or not 0 < player.x < self.width or self.player_collided():
             self.game_over()
 
     def game_over(self):
@@ -57,6 +57,19 @@ class Game(Screen):
             self.remove_widget(ob)
         self.obstacles = []
         root.current = 'game_over'
+
+    @staticmethod
+    def collided(wid1, wid2):
+        if wid2.x <= wid1.x + wid1.width and wid2.x + wid2.width >= wid1.x and \
+                wid2.y <= wid1.y + wid1.height and wid2.y + wid2.height >= wid1.y:
+            return True
+        return False
+
+    def player_collided(self):
+        for ob in self.obstacles:
+            if self.collided(player, ob):
+                return True
+        return False
 
     def on_touch_down(self, touch):
         player.speed_y = self.height
