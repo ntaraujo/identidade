@@ -14,6 +14,7 @@ class Manager(ScreenManager):
 
 class Game(Screen):
     obstacles = []
+    score = NumericProperty()
 
     def __init__(self, **kw):
         global game

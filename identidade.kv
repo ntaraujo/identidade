@@ -33,6 +33,16 @@ Manager:
     source: 'ball.png'
 
 <Game>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDLabel:
+            text: 'Placar: ' + str(root.score)
+            halign: 'center'
+            font_style: 'H3'
+            size_hint_y: 1 / 3
+            # theme_text_color: "Custom"
+            # text_color: app.theme_cls.accent_color
+        Widget
     MDFloatLayout:
         Player:
             id: player
