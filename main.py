@@ -19,6 +19,8 @@ class Game(Screen):
     speed_y_parameter = 5 / 4
     interval = 2
     duration = 3
+    height_gap = NumericProperty()
+    game_height = NumericProperty()
 
     def __init__(self, **kw):
         global game
@@ -69,7 +71,9 @@ class Game(Screen):
         player.speed_y += -self.height * 4 * 1 / 30
         player.y += player.speed_y * 1 / 30
         player.x -= player.speed_x * 1 / 30
-        if not 0 < player.y < self.height or not 0 < player.x < self.width or self.player_collided():
+        if not -self.height_gap < player.y < self.game_height or \
+                not 0 < player.x < self.width or \
+                self.player_collided():
             self.game_over()
 
     def game_over(self):
