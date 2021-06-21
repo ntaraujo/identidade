@@ -5,6 +5,7 @@ from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
 from random import random
+from kivy.core.audio import SoundLoader
 
 
 class Manager(ScreenManager):
@@ -18,6 +19,10 @@ class Game(Screen):
     def __init__(self, **kw):
         global game
         game = self
+        self.music = SoundLoader.load('lofi.mp3')
+        if self.music:
+            self.music.loop = True
+            self.music.play()
         super().__init__(**kw)
 
     def on_enter(self, *args):
