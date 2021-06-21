@@ -86,16 +86,9 @@ class Game(Screen):
         game_over.high_score = max(game_over.high_score, self.score)
         root.current = 'game_over'
 
-    @staticmethod
-    def collided(wid1, wid2):
-        if wid2.x <= wid1.x + wid1.width and wid2.x + wid2.width >= wid1.x and \
-                wid2.y <= wid1.y + wid1.height and wid2.y + wid2.height >= wid1.y:
-            return True
-        return False
-
     def player_collided(self):
         for ob in self.obstacles:
-            if self.collided(player, ob):
+            if player.collide_widget(ob):
                 return True
         return False
 
