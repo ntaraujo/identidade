@@ -110,7 +110,7 @@ class Game(Screen):
         else:
             self.stop_and_clear()
             button.bind(on_release=dialog.dismiss)
-            button.bind(on_release=self.dismiss_dialog)
+            dialog.bind(on_dismiss=self.dismiss_dialog)
             dialog.open()
 
     def dismiss_dialog(self, *args):
