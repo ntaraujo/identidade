@@ -51,7 +51,8 @@ Manager:
     MDFloatLayout:
         Player:
             size_hint: None, None
-            size: root.height / 15, root.height / 15
+            size_parameter: min(root.height, root.width) / 15
+            size: self.size_parameter, self.size_parameter
             x: root.width * 0.9
             y: root.height / 20
 

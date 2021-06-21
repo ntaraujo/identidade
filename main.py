@@ -4,7 +4,6 @@ from kivy.properties import NumericProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
-from kivy.uix.image import Image
 from random import random
 
 
@@ -22,13 +21,15 @@ class Game(Screen):
         super().__init__(**kw)
 
     def on_enter(self, *args):
+        player.speed_y = self.height * 1.25
+        player.speed_x = self.width * 0.75
         Clock.schedule_interval(self.update, 1/30)
         Clock.schedule_interval(self.put_obstacle, 2)
 
     def put_obstacle(self, *args):
         gap = self.width / 2
         position = (self.width - gap) * random()
-        height = self.height * 0.05
+        height = self.height * 0.02
         obstacle_left = Obstacle(y=self.height, width=position, height=height)
         obstacle_right = Obstacle(y=self.height, x=position+gap, width=self.width-position-gap, height=height)
         self.add_widget(obstacle_left)
@@ -39,8 +40,6 @@ class Game(Screen):
     def on_pre_enter(self, *args):
         player.x = self.width * 0.9
         player.y = self.height / 20
-        player.speed_y = 1000
-        player.speed_x = 500
         self.score = 0
 
     def update(self, *args):
@@ -52,7 +51,7 @@ class Game(Screen):
 
     def game_over(self):
         Clock.unschedule(self.update, 1/30)
-        Clock.unschedule(self.put_obstacle, 1)
+        Clock.unschedule(self.put_obstacle, 2)
         for ob in self.obstacles:
             ob.anim.cancel(ob)
             self.remove_widget(ob)
@@ -78,8 +77,8 @@ class Game(Screen):
 
 
 class Player(Widget):
-    speed_y = NumericProperty(1000)
-    speed_x = NumericProperty(500)
+    speed_y = NumericProperty()
+    speed_x = NumericProperty()
 
     def __init__(self, **kwargs):
         global player
