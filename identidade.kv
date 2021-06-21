@@ -30,7 +30,12 @@ Manager:
                 on_release: app.stop()
 
 <Player>:
-    source: 'ball.png'
+    canvas:
+        Color:
+            rgba: app.theme_cls.primary_color
+        Ellipse:
+            size: self.size
+            pos: self.pos
 
 <Game>:
     MDBoxLayout:
@@ -45,8 +50,6 @@ Manager:
         Widget
     MDFloatLayout:
         Player:
-            id: player
-            allow_stretch: True
             size_hint: None, None
             size: root.height / 15, root.height / 15
             x: root.width * 0.9

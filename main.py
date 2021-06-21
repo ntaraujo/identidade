@@ -63,7 +63,7 @@ class Game(Screen):
         player.speed_x *= -1
 
 
-class Player(Image):
+class Player(Widget):
     speed_y = NumericProperty(1000)
     speed_x = NumericProperty(500)
 
