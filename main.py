@@ -61,6 +61,7 @@ class Game(Screen):
             ob.anim.cancel(ob)
             self.remove_widget(ob)
         self.obstacles = []
+        game_over.high_score = max(game_over.high_score, self.score)
         root.current = 'game_over'
 
     @staticmethod
@@ -96,7 +97,12 @@ class Menu(Screen):
 
 
 class GameOver(Screen):
-    pass
+    high_score = NumericProperty()
+
+    def __init__(self, **kw):
+        global game_over
+        game_over = self
+        super().__init__(**kw)
 
 
 class Obstacle(Widget):

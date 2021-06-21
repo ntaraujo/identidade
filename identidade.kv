@@ -59,13 +59,22 @@ Manager:
 <GameOver>:
     MDBoxLayout:
         orientation: 'vertical'
-        MDLabel:
-            text: 'Fim de Jogo'
-            halign: 'center'
-            font_style: 'H2'
-            theme_text_color: "Custom"
-            text_color: app.theme_cls.accent_color
-            size_hint_y: 3
+        Widget
+        MDBoxLayout:
+            orientation: 'vertical'
+            adaptive_height: True
+            MDLabel:
+                text: 'Fim de Jogo'
+                halign: 'center'
+                font_style: 'H2'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.accent_color
+            MDLabel:
+                text: 'Maior pontuação: ' + str(int(root.high_score))
+                halign: 'center'
+                font_style: 'Subtitle1'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.accent_color
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
