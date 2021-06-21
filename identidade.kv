@@ -101,9 +101,10 @@ Manager:
                 line_color: app.theme_cls.accent_color
 
 <Obstacle>
+    color: app.theme_cls.accent_color
     canvas:
         Color:
-            rgba: app.theme_cls.accent_color
+            rgba: root.color or app.theme_cls.accent_color
         Rectangle:
             size: self.size
             pos: self.pos

@@ -4,7 +4,7 @@ from kivy.properties import NumericProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
-from random import random
+from random import random, choice
 from kivy.core.audio import SoundLoader
 
 
@@ -21,6 +21,7 @@ class Game(Screen):
     duration = 3
     height_gap = NumericProperty()
     game_height = NumericProperty()
+    random_obstacle = None
 
     def __init__(self, **kw):
         global game
@@ -72,10 +73,19 @@ class Game(Screen):
         player.speed_y += -self.height * 4 * 1 / 30
         player.y += player.speed_y * 1 / 30
         player.x -= player.speed_x * 1 / 30
-        if not -self.height_gap < player.y < self.game_height or \
-                not 0 < player.x < self.width or \
-                self.player_collided():
+        if not -self.height_gap < player.y < self.game_height or not 0 < player.x < self.width:
             self.game_over()
+        else:
+            ob = self.obstacle_collided()
+            if ob is None:
+                return
+            elif ob == self.random_obstacle and ob.color == app.theme_cls.primary_color:
+                ob.color = app.theme_cls.accent_color
+                Clock.schedule_once(lambda *a: setattr(self, 'random_obstacle', None), 2)
+                player.speed_y *= -1
+                self.next_level()
+            else:
+                self.game_over()
 
     def game_over(self):
         Clock.unschedule(self.update, 1 / 30)
@@ -87,15 +97,19 @@ class Game(Screen):
         game_over.high_score = max(game_over.high_score, self.score)
         root.current = 'game_over'
 
-    def player_collided(self):
+    def obstacle_collided(self):
         for ob in self.obstacles:
             if player.collide_widget(ob):
-                return True
-        return False
+                return ob
+        return None
 
     def on_touch_down(self, touch):
         player.speed_y = self.height
         player.speed_x *= -1
+
+    def obstacle_choice(self):
+        self.random_obstacle = choice(self.obstacles)
+        self.random_obstacle.color = app.theme_cls.primary_color
 
 
 class Player(Widget):
@@ -134,7 +148,7 @@ class Obstacle(Widget):
         game.obstacles.remove(self)
 
         if game.score % 4 == 0:
-            game.next_level()
+            game.obstacle_choice()
 
 
 class Identidade(MDApp):
