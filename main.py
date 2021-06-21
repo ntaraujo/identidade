@@ -44,7 +44,7 @@ class Game(Screen):
     def on_enter(self, *args):
         player.speed_y = self.height * self.speed_y_parameter
         player.speed_x = self.width * 0.75
-        Clock.schedule_interval(self.update, 1/30)
+        Clock.schedule_interval(self.update, 1 / 30)
         Clock.schedule_interval(self.put_obstacle, 2)
 
     def put_obstacle(self, *args):
@@ -52,7 +52,7 @@ class Game(Screen):
         position = (self.width - gap) * random()
         height = self.height * 0.02
         obstacle_left = Obstacle(y=self.height, width=position, height=height)
-        obstacle_right = Obstacle(y=self.height, x=position+gap, width=self.width-position-gap, height=height)
+        obstacle_right = Obstacle(y=self.height, x=position + gap, width=self.width - position - gap, height=height)
         self.add_widget(obstacle_left)
         self.obstacles.append(obstacle_left)
         self.add_widget(obstacle_right)
@@ -77,7 +77,7 @@ class Game(Screen):
             self.game_over()
 
     def game_over(self):
-        Clock.unschedule(self.update, 1/30)
+        Clock.unschedule(self.update, 1 / 30)
         Clock.unschedule(self.put_obstacle, 2)
         for ob in self.obstacles:
             ob.anim.cancel(ob)
