@@ -6,7 +6,7 @@ from kivy.properties import NumericProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
-from random import random, choice
+from random import random, randrange, choice
 from kivy.core.audio import SoundLoader
 from kivymd.uix.button import MDRectangleFlatButton
 from kivymd.uix.dialog import MDDialog
@@ -141,7 +141,15 @@ class Game(Screen):
         player.speed_x *= -1
 
     def obstacle_choice(self):
-        self.random_obstacle = choice(self.obstacles)
+        obs = iter(self.obstacles)
+        c = randrange(0, int(len(self.obstacles) / 2))
+        for index, (o1, o2) in enumerate(zip(obs, obs)):
+            if index == c:
+                self.random_obstacle = o1 if o1.width > o2.width else o2
+                break
+        else:
+            self.random_obstacle = choice(self.obstacles)
+            print('obstacle_choice fail')
         self.random_obstacle.color = app.theme_cls.primary_color
 
 
