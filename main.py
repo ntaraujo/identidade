@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.properties import NumericProperty
@@ -8,6 +10,7 @@ from random import random, choice
 from kivy.core.audio import SoundLoader
 from kivymd.uix.button import MDRectangleFlatButton
 from kivymd.uix.dialog import MDDialog
+from json import load
 
 
 class Manager(ScreenManager):
@@ -24,14 +27,8 @@ class Game(Screen):
     height_gap = NumericProperty()
     game_height = NumericProperty()
     random_obstacle = None
-    dialogs = [
-        {"title": "Teste",
-         "text": "Testandoooo"},
-        {"title": "Teste",
-         "text": "Testandoooo"},
-        {"title": "Teste",
-         "text": "Testandoooo"}
-    ]
+    with open('dialogs.json', 'r', encoding='utf-8') as dialogs:
+        dialogs = load(dialogs)
 
     def __init__(self, **kw):
         global game
@@ -97,19 +94,24 @@ class Game(Screen):
             elif ob == self.random_obstacle:
                 ob.color = app.theme_cls.accent_color
                 self.random_obstacle = None
-                player.speed_y *= -1
+                if player.speed_y < 0:
+                    player.speed_y *= -1
                 player.speed_x *= -1
                 self.show_dialog()
             else:
                 self.game_over()
 
     def show_dialog(self, *args):
-        self.stop_and_clear()
         button = MDRectangleFlatButton(text="Peguei!")
-        dialog = MDDialog(buttons=[button], **self.dialogs[self.level])
-        button.bind(on_release=dialog.dismiss)
-        button.bind(on_release=self.dismiss_dialog)
-        dialog.open()
+        try:
+            dialog = MDDialog(buttons=[button], **self.dialogs[self.level])
+        except IndexError:
+            self.next_level()  # no more dialogs
+        else:
+            self.stop_and_clear()
+            button.bind(on_release=dialog.dismiss)
+            button.bind(on_release=self.dismiss_dialog)
+            dialog.open()
 
     def dismiss_dialog(self, *args):
         self.play(obstacle=False)
