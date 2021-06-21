@@ -1,79 +1,105 @@
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.properties import NumericProperty
+from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.image import Image
-from random import choice, randrange
+from random import randrange
 
-
-class Game(Screen):
-    birds = []
-
-    def on_enter(self, *args):
-        Clock.schedule_interval(self.update, 1 / 30)
-        Clock.schedule_interval(self.put_bird, 2)
-
-    def put_bird(self, *args):
-        bird = Bird(y=randrange(0, self.height), x=choice((0, self.width)))
-        self.add_widget(bird)
-        self.birds.append(bird)
-
-    def game_over(self):
-        # Clock.unschedule(self.update, 1 / 30)
-        # Clock.unschedule(self.put_bird, 2)
-        self.ids.player.x = self.width / 1.25
-        self.ids.player.y = self.height / 20
-        self.ids.player.speed_y = 1000
-        self.ids.player.speed_x = 500
-        for b in self.birds:
-            b.anim.cancel(b)
-            self.remove_widget(b)
-        self.birds = []
-
-    def update(self, *args):
-        self.ids.player.speed_y += -self.height * 3 * 1 / 30
-        self.ids.player.y += self.ids.player.speed_y * 1 / 30
-        self.ids.player.x -= self.ids.player.speed_x * 1 / 30
-        if not (0 < self.ids.player.y < self.height) or not (0 < self.ids.player.x < self.width):
-            self.game_over()
-
-    def on_touch_down(self, touch):
-        self.ids.player.speed_y = self.height
-        self.ids.player.speed_x *= -1
+from kivymd.uix.floatlayout import MDFloatLayout
 
 
 class Manager(ScreenManager):
     pass
 
 
+class Game(Screen):
+    obstacles = []
+
+    def __init__(self, **kw):
+        global game
+        game = self
+        super().__init__(**kw)
+
+    def on_enter(self, *args):
+        Clock.schedule_interval(self.update, 1/30)
+        Clock.schedule_interval(self.put_obstacle, 1)
+
+    def put_obstacle(self, *args):
+        position = 400
+        gap = 200
+        obstacle_left = Obstacle(y=self.height, width=position)
+        obstacle_right = Obstacle(y=self.height, x=position+gap, width=self.width-position-gap)
+        self.add_widget(obstacle_left)
+        self.obstacles.append(obstacle_left)
+        self.add_widget(obstacle_right)
+        self.obstacles.append(obstacle_right)
+
+    def on_pre_enter(self, *args):
+        player.x = self.width * 0.9
+        player.y = self.height / 20
+        player.speed_y = 1000
+        player.speed_x = 500
+
+    def update(self, *args):
+        player.speed_y += -self.height * 3 * 1 / 30
+        player.y += player.speed_y * 1 / 30
+        player.x -= player.speed_x * 1 / 30
+        if not 0 < player.y < self.height or not 0 < player.x < self.width:
+            self.game_over()
+
+    def game_over(self):
+        Clock.unschedule(self.update, 1/30)
+        Clock.unschedule(self.put_obstacle, 1)
+        for ob in self.obstacles:
+            ob.anim.cancel(ob)
+            self.remove_widget(ob)
+        self.obstacles = []
+        root.current = 'game_over'
+
+    def on_touch_down(self, touch):
+        player.speed_y = self.height
+        player.speed_x *= -1
+
+
 class Player(Image):
     speed_y = NumericProperty(1000)
     speed_x = NumericProperty(500)
 
+    def __init__(self, **kwargs):
+        global player
+        player = self
+        super().__init__(**kwargs)
 
-class Bird(Image):
+
+class Menu(Screen):
+    pass
+
+
+class GameOver(Screen):
+    pass
+
+
+class Obstacle(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        game_screen = MDApp.get_running_app().root.get_screen('game')
-        x = game_screen.width if self.x == 0 else 0
-        self.anim = Animation(y=game_screen.ids.player.y, x=x, duration=0.5)
+        self.anim = Animation(y=-self.height, duration=3)
         self.anim.bind(on_complete=self.vanish)
         self.anim.start(self)
 
     def vanish(self, *args):
-        game_screen = MDApp.get_running_app().root.get_screen('game')
-        game_screen.remove_widget(self)
-        game_screen.birds.remove(self)
-
-
-class Trampoline(Image):
-    pass
+        game.remove_widget(self)
+        game.obstacles.remove(self)
 
 
 class Identidade(MDApp):
-    pass
+    def build(self):
+        global root
+        root = self.root
+        self.theme_cls.theme_style = "Dark"
 
 
 if __name__ in ('__main__', '__android__'):
-    Identidade().run()
+    app = Identidade()
+    app.run()

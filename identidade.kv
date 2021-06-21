@@ -1,6 +1,33 @@
 Manager:
+    Menu:
+        name: 'menu'
     Game:
         name: 'game'
+    GameOver:
+        name: 'game_over'
+
+<Menu>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDLabel:
+            text: 'Identidade'
+            halign: 'center'
+            size_hint_y: 3
+            font_style: 'H2'
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.primary_color
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Começar'
+                on_release: app.root.current = 'game'
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Sair'
+                on_release: app.stop()
 
 <Player>:
     source: 'ball.png'
@@ -11,11 +38,43 @@ Manager:
             id: player
             allow_stretch: True
             size_hint: None, None
-            size: root.height/20, root.height/20
-            x: root.width/1.25
-            y: root.height/20
+            size: root.height / 15, root.height / 15
+            x: root.width * 0.9
+            y: root.height / 20
 
-<Bird>
-    source: 'bird.png'
+<GameOver>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDLabel:
+            text: 'Fim de Jogo'
+            halign: 'center'
+            font_style: 'H2'
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.accent_color
+            size_hint_y: 3
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Tentar de novo'
+                on_release: app.root.current = 'game'
+                text_color: app.theme_cls.accent_color
+                line_color: app.theme_cls.accent_color
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Sair'
+                on_release: app.stop()
+                text_color: app.theme_cls.accent_color
+                line_color: app.theme_cls.accent_color
+
+<Obstacle>
+    canvas:
+        Color:
+            rgba: app.theme_cls.accent_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
     size_hint: None, None
-    size: 100, 100
+    height: '50dp'
