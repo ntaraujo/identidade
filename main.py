@@ -32,14 +32,15 @@ class Game(Screen):
         super().__init__(**kw)
 
     def next_level(self):
-        Clock.unschedule(self.put_obstacle, self.interval)
         self.level += 1
-        self.interval -= self.interval / 8
         self.duration -= self.duration / 8
-        self.speed_y_parameter -= self.speed_y_parameter / 10
-        Clock.schedule_interval(self.put_obstacle, self.interval)
+        self.speed_y_parameter -= self.speed_y_parameter / 8
         speed_y = self.height * self.speed_y_parameter
         player.speed_y = speed_y if player.speed_y >= 0 else -speed_y
+
+        Clock.unschedule(self.put_obstacle, self.interval)
+        self.interval -= self.interval / 8
+        Clock.schedule_interval(self.put_obstacle, self.interval)
 
     def on_enter(self, *args):
         player.speed_y = self.height * self.speed_y_parameter
