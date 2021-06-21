@@ -41,6 +41,7 @@ class Game(Screen):
         player.y = self.height / 20
         player.speed_y = 1000
         player.speed_x = 500
+        self.score = 0
 
     def update(self, *args):
         player.speed_y += -self.height * 4 * 1 / 30
@@ -102,6 +103,7 @@ class Obstacle(Widget):
         self.anim.start(self)
 
     def vanish(self, *args):
+        game.score += 0.5
         game.remove_widget(self)
         game.obstacles.remove(self)
 
