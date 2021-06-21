@@ -6,6 +6,8 @@ from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
 from random import random, choice
 from kivy.core.audio import SoundLoader
+from kivymd.uix.button import MDRectangleFlatButton
+from kivymd.uix.dialog import MDDialog
 
 
 class Manager(ScreenManager):
@@ -22,6 +24,14 @@ class Game(Screen):
     height_gap = NumericProperty()
     game_height = NumericProperty()
     random_obstacle = None
+    dialogs = [
+        {"title": "Teste",
+         "text": "Testandoooo"},
+        {"title": "Teste",
+         "text": "Testandoooo"},
+        {"title": "Teste",
+         "text": "Testandoooo"}
+    ]
 
     def __init__(self, **kw):
         global game
@@ -32,22 +42,27 @@ class Game(Screen):
             self.music.play()
         super().__init__(**kw)
 
-    def next_level(self):
+    def next_level(self, obstacle_running=True):
         self.level += 1
         self.duration -= self.duration / 8
         self.speed_y_parameter -= self.speed_y_parameter / 8
         speed_y = self.height * self.speed_y_parameter
         player.speed_y = speed_y if player.speed_y >= 0 else -speed_y
 
-        Clock.unschedule(self.put_obstacle, self.interval)
+        if obstacle_running:
+            Clock.unschedule(self.put_obstacle, self.interval)
         self.interval -= self.interval / 8
         Clock.schedule_interval(self.put_obstacle, self.interval)
 
     def on_enter(self, *args):
         player.speed_y = self.height * self.speed_y_parameter
         player.speed_x = self.width * 0.75
+        self.play()
+
+    def play(self, obstacle=True):
         Clock.schedule_interval(self.update, 1 / 30)
-        Clock.schedule_interval(self.put_obstacle, 2)
+        if obstacle:
+            Clock.schedule_interval(self.put_obstacle, 2)
 
     def put_obstacle(self, *args):
         gap = self.width / 2
@@ -79,21 +94,37 @@ class Game(Screen):
             ob = self.obstacle_collided()
             if ob is None:
                 return
-            elif ob == self.random_obstacle and ob.color == app.theme_cls.primary_color:
+            elif ob == self.random_obstacle:
                 ob.color = app.theme_cls.accent_color
-                Clock.schedule_once(lambda *a: setattr(self, 'random_obstacle', None), 2)
+                self.random_obstacle = None
                 player.speed_y *= -1
-                self.next_level()
+                player.speed_x *= -1
+                self.show_dialog()
             else:
                 self.game_over()
 
-    def game_over(self):
+    def show_dialog(self, *args):
+        self.stop_and_clear()
+        button = MDRectangleFlatButton(text="Peguei!")
+        dialog = MDDialog(buttons=[button], **self.dialogs[self.level])
+        button.bind(on_release=dialog.dismiss)
+        button.bind(on_release=self.dismiss_dialog)
+        dialog.open()
+
+    def dismiss_dialog(self, *args):
+        self.play(obstacle=False)
+        self.next_level(obstacle_running=False)
+
+    def stop_and_clear(self):
         Clock.unschedule(self.update, 1 / 30)
         Clock.unschedule(self.put_obstacle, 2)
         for ob in self.obstacles:
             ob.anim.cancel(ob)
             self.remove_widget(ob)
         self.obstacles = []
+
+    def game_over(self):
+        self.stop_and_clear()
         game_over.high_score = max(game_over.high_score, self.score)
         root.current = 'game_over'
 
