@@ -15,6 +15,10 @@ class Manager(ScreenManager):
 class Game(Screen):
     obstacles = []
     score = NumericProperty()
+    level = NumericProperty(0)
+    speed_y_parameter = 5 / 4
+    interval = 2
+    duration = 3
 
     def __init__(self, **kw):
         global game
@@ -25,8 +29,18 @@ class Game(Screen):
             self.music.play()
         super().__init__(**kw)
 
+    def next_level(self):
+        Clock.unschedule(self.put_obstacle, self.interval)
+        self.level += 1
+        self.interval -= self.interval / 8
+        self.duration -= self.duration / 8
+        self.speed_y_parameter -= self.speed_y_parameter / 10
+        Clock.schedule_interval(self.put_obstacle, self.interval)
+        speed_y = self.height * self.speed_y_parameter
+        player.speed_y = speed_y if player.speed_y >= 0 else -speed_y
+
     def on_enter(self, *args):
-        player.speed_y = self.height * 1.25
+        player.speed_y = self.height * self.speed_y_parameter
         player.speed_x = self.width * 0.75
         Clock.schedule_interval(self.update, 1/30)
         Clock.schedule_interval(self.put_obstacle, 2)
@@ -46,6 +60,10 @@ class Game(Screen):
         player.x = self.width * 0.9
         player.y = self.height / 20
         self.score = 0
+        self.level = 0
+        self.speed_y_parameter = 5 / 4
+        self.interval = 2
+        self.duration = 3
 
     def update(self, *args):
         player.speed_y += -self.height * 4 * 1 / 30
@@ -108,7 +126,7 @@ class GameOver(Screen):
 class Obstacle(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.anim = Animation(y=-self.height, duration=3)
+        self.anim = Animation(y=-self.height, duration=game.duration)
         self.anim.bind(on_complete=self.vanish)
         self.anim.start(self)
 
@@ -116,6 +134,9 @@ class Obstacle(Widget):
         game.score += 0.5
         game.remove_widget(self)
         game.obstacles.remove(self)
+
+        if game.score % 4 == 0:
+            game.next_level()
 
 
 class Identidade(MDApp):
