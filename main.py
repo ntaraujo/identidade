@@ -5,9 +5,7 @@ from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.image import Image
-from random import randrange
-
-from kivymd.uix.floatlayout import MDFloatLayout
+from random import random
 
 
 class Manager(ScreenManager):
@@ -27,10 +25,11 @@ class Game(Screen):
         Clock.schedule_interval(self.put_obstacle, 1)
 
     def put_obstacle(self, *args):
-        position = 400
-        gap = 200
-        obstacle_left = Obstacle(y=self.height, width=position)
-        obstacle_right = Obstacle(y=self.height, x=position+gap, width=self.width-position-gap)
+        gap = self.width / 3
+        position = (self.width - gap) * random()
+        height = self.height * 0.05
+        obstacle_left = Obstacle(y=self.height, width=position, height=height)
+        obstacle_right = Obstacle(y=self.height, x=position+gap, width=self.width-position-gap, height=height)
         self.add_widget(obstacle_left)
         self.obstacles.append(obstacle_left)
         self.add_widget(obstacle_right)
