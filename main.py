@@ -3,7 +3,7 @@
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.properties import NumericProperty, BooleanProperty
+from kivy.properties import NumericProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -177,9 +177,8 @@ class Game(Screen):
         return None
 
     def on_touch_down(self, touch):
-        player.speed_y = self.height
-        player.speed_x *= -1
-        return False
+        player.jump()
+        return super().on_touch_down(touch)
 
     def obstacle_choice(self):
         obs = iter(self.obstacles)
@@ -202,6 +201,10 @@ class Player(Widget):
         global player
         player = self
         super().__init__(**kwargs)
+
+    def jump(self):
+        self.speed_y = game.height
+        self.speed_x *= -1
 
 
 class Menu(Screen):
@@ -255,6 +258,9 @@ class Identidade(MDApp):
             if root.current == 'game':
                 game.pause()
                 return True
+        elif key == 32:  # space
+            if root.current == 'game':
+                player.jump()
 
     def on_pause(self):
         if root.current == 'game':
