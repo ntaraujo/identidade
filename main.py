@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from kivy import Config
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -15,14 +15,19 @@ from json import load
 from webbrowser import open as web_open
 
 
+Config.adddefaultsection('identidade')
+Config.setdefaults('identidade', {'level': 0, 'volume': 100, 'spf': 1 / 30, 'high_score': 0})
+
+
 class Manager(ScreenManager):
     pass
 
 
 class Game(Screen):
     obstacles = []
-    score = NumericProperty()
-    level = NumericProperty(0)
+    score = NumericProperty(0)
+    level = NumericProperty(Config.getint('identidade', 'level'))
+    spf = NumericProperty(Config.getfloat('identidade', 'spf'))
     speed_y_parameter = 5 / 4
     interval = 2
     duration = 3
@@ -69,9 +74,9 @@ class Game(Screen):
         self.play()
 
     def play(self, obstacle=True):
-        Clock.schedule_interval(self.update, 1 / 30)
+        Clock.schedule_interval(self.update, self.spf)
         if obstacle:
-            Clock.schedule_interval(self.put_obstacle, 2)
+            Clock.schedule_interval(self.put_obstacle, self.interval)
 
     def put_obstacle(self, *args):
         gap = self.width / 2
@@ -97,9 +102,9 @@ class Game(Screen):
             self.paused = False
 
     def update(self, *args):
-        player.speed_y += -self.height * 4 * 1 / 30
-        player.y += player.speed_y * 1 / 30
-        player.x -= player.speed_x * 1 / 30
+        player.speed_y += -self.height * 4 * self.spf
+        player.y += player.speed_y * self.spf
+        player.x -= player.speed_x * self.spf
         if not -self.height_gap < player.y < self.game_height or not -self.width_gap < player.x < self.game_width:
             self.game_over()
         else:
@@ -155,8 +160,8 @@ class Game(Screen):
         self.next_level(obstacle_running=False)
 
     def stop_and_clear(self):
-        Clock.unschedule(self.update, 1 / 30)
-        Clock.unschedule(self.put_obstacle, 2)
+        Clock.unschedule(self.update, self.spf)
+        Clock.unschedule(self.put_obstacle, self.interval)
         for ob in self.obstacles:
             ob.anim.cancel(ob)
             self.remove_widget(ob)
@@ -185,6 +190,7 @@ class Game(Screen):
         return super().on_touch_down(touch)
 
     def obstacle_choice(self):
+        # heavy, looks like there is only one possible obstacle
         obs = iter(self.obstacles)
         c = randrange(0, int(len(self.obstacles) / 2))
         for index, (o1, o2) in enumerate(zip(obs, obs)):
@@ -216,7 +222,7 @@ class Menu(Screen):
 
 
 class GameOver(Screen):
-    high_score = NumericProperty()
+    high_score = NumericProperty(Config.getfloat('identidade', 'high_score'))
 
     def __init__(self, **kw):
         global game_over
@@ -232,6 +238,10 @@ class Pause(Screen):
         global pause
         pause = self
         super().__init__(**kw)
+
+
+class Settings(Screen):
+    pass
 
 
 class Obstacle(Widget):
