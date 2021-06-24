@@ -2,7 +2,8 @@
 
 from kivy.animation import Animation
 from kivy.clock import Clock
-from kivy.properties import NumericProperty
+from kivy.core.window import Window
+from kivy.properties import NumericProperty, BooleanProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -30,6 +31,8 @@ class Game(Screen):
     width_gap = NumericProperty()
     game_width = NumericProperty()
     random_obstacle = None
+    paused = False
+
     with open('dialogs.json', 'r', encoding='utf-8') as dialogs:
         dialogs = load(dialogs)
 
@@ -40,6 +43,8 @@ class Game(Screen):
         if self.music:
             self.music.loop = True
             self.music.play()
+        else:
+            print('[identidade] lofi.mp3 not found')
         self.dialog = None
         super().__init__(**kw)
 
@@ -56,8 +61,11 @@ class Game(Screen):
         Clock.schedule_interval(self.put_obstacle, self.interval)
 
     def on_enter(self, *args):
-        player.speed_y = self.height * self.speed_y_parameter
-        player.speed_x = self.width * 0.75
+        if not self.paused:
+            player.speed_y = self.height * self.speed_y_parameter
+            player.speed_x = self.width * 0.75
+        else:
+            self.paused = False
         self.play()
 
     def play(self, obstacle=True):
@@ -77,13 +85,16 @@ class Game(Screen):
         self.obstacles.append(obstacle_right)
 
     def on_pre_enter(self, *args):
-        player.x = self.width * 0.9
-        player.y = self.height / 20
-        self.score = 0
-        self.level = 0
-        self.speed_y_parameter = 5 / 4
-        self.interval = 2
-        self.duration = 3
+        if not self.paused:
+            player.x = self.width * 0.9
+            player.y = self.height / 20
+            self.score = 0
+            self.level = 0
+            self.speed_y_parameter = 5 / 4
+            self.interval = 2
+            self.duration = 3
+        else:
+            self.paused = False
 
     def update(self, *args):
         player.speed_y += -self.height * 4 * 1 / 30
@@ -152,6 +163,13 @@ class Game(Screen):
         game_over.high_score = max(game_over.high_score, self.score)
         root.current = 'game_over'
 
+    def pause(self):
+        self.stop_and_clear()
+        self.paused = True
+        pause.game_score = self.score
+        pause.game_level = self.level
+        root.current = 'pause'
+
     def obstacle_collided(self):
         for ob in self.obstacles:
             if player.collide_widget(ob):
@@ -161,6 +179,7 @@ class Game(Screen):
     def on_touch_down(self, touch):
         player.speed_y = self.height
         player.speed_x *= -1
+        return False
 
     def obstacle_choice(self):
         obs = iter(self.obstacles)
@@ -198,6 +217,16 @@ class GameOver(Screen):
         super().__init__(**kw)
 
 
+class Pause(Screen):
+    game_score = NumericProperty()
+    game_level = NumericProperty()
+
+    def __init__(self, **kw):
+        global pause
+        pause = self
+        super().__init__(**kw)
+
+
 class Obstacle(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -219,8 +248,17 @@ class Identidade(MDApp):
         global root
         root = self.root
         self.theme_cls.theme_style = "Dark"
+        Window.bind(on_keyboard=self.keyboard_handler)
+
+    def keyboard_handler(self, window, key, *args):
+        if key == 27:  # ESC or back button
+            if root.current == 'game':
+                game.pause()
+                return True
 
     def on_pause(self):
+        if root.current == 'game':
+            game.pause()
         return True
 
 

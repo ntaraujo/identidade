@@ -7,6 +7,8 @@ Manager:
         name: 'game'
     GameOver:
         name: 'game_over'
+    Pause:
+        name: 'pause'
 
 <Menu>:
     MDBoxLayout:
@@ -101,6 +103,37 @@ Manager:
                 on_release: app.stop()
                 text_color: app.theme_cls.accent_color
                 line_color: app.theme_cls.accent_color
+
+<Pause>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        Widget
+        MDBoxLayout:
+            orientation: 'vertical'
+            MDLabel:
+                text: 'Placar: ' + str(int(root.game_score))
+                halign: 'center'
+                font_style: 'H2'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+            MDLabel:
+                text: 'Nível: ' + str(int(root.game_level))
+                halign: 'center'
+                font_style: 'Subtitle1'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Continuar'
+                on_release: app.root.current = 'game'
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Menu'
+                on_release: app.root.current = 'menu'
 
 <Obstacle>
     color: app.theme_cls.accent_color
