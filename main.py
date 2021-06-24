@@ -26,6 +26,8 @@ class Game(Screen):
     duration = 3
     height_gap = NumericProperty()
     game_height = NumericProperty()
+    width_gap = NumericProperty()
+    game_width = NumericProperty()
     random_obstacle = None
     with open('dialogs.json', 'r', encoding='utf-8') as dialogs:
         dialogs = load(dialogs)
@@ -85,7 +87,7 @@ class Game(Screen):
         player.speed_y += -self.height * 4 * 1 / 30
         player.y += player.speed_y * 1 / 30
         player.x -= player.speed_x * 1 / 30
-        if not -self.height_gap < player.y < self.game_height or not 0 < player.x < self.width:
+        if not -self.height_gap < player.y < self.game_height or not -self.width_gap < player.x < self.game_width:
             self.game_over()
         else:
             ob = self.obstacle_collided()
