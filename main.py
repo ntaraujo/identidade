@@ -125,10 +125,13 @@ class Game(Screen):
             self.next_level(obstacle_running=False)
             return
 
+        def dismiss_dialog(*_):
+            self.dialog.dismiss()
+
         btns_info = info.pop("buttons", None)
         if btns_info is None:
             button = MDRectangleFlatButton(text="Peguei!")
-            button.bind(on_release=self.dismiss_dialog)
+            button.bind(on_release=dismiss_dialog)
             buttons = [button]
         else:
             buttons = []
@@ -140,13 +143,14 @@ class Game(Screen):
                         web_open(link)
                     button.bind(on_release=open_button_link)
                 else:
-                    button.bind(on_release=self.dismiss_dialog)
+                    button.bind(on_release=dismiss_dialog)
                 buttons.append(button)
-        self.dialog = MDDialog(buttons=buttons, **info)
+        app.dialog_button = buttons[-1]
+        self.dialog = MDDialog(auto_dismiss=False, buttons=buttons, **info)
+        self.dialog.bind(on_dismiss=self.dismissed_dialog)
         self.dialog.open()
 
-    def dismiss_dialog(self, *args):
-        self.dialog.dismiss()
+    def dismissed_dialog(self, *args):
         self.play(obstacle=False)
         self.next_level(obstacle_running=False)
 
@@ -247,6 +251,8 @@ class Obstacle(Widget):
 
 
 class Identidade(MDApp):
+    dialog_button = None
+
     def build(self):
         global root
         root = self.root
@@ -255,12 +261,22 @@ class Identidade(MDApp):
 
     def keyboard_handler(self, window, key, *args):
         if key == 27:  # ESC or back button
-            if root.current == 'game':
+            if root.current == 'game' and not isinstance(app.root_window.children[0], MDDialog):
                 game.pause()
                 return True
         elif key == 32:  # space
             if root.current == 'game':
                 player.jump()
+                return True
+        elif key == 13:  # enter
+            if self.dialog_button is None:
+                if root.current in ('menu', 'game_over', 'pause'):
+                    root.current = 'game'
+                    return True
+            else:
+                self.dialog_button.dispatch('on_press')
+                self.dialog_button.dispatch('on_release')
+                self.dialog_button = None
 
     def on_pause(self):
         if root.current == 'game':
