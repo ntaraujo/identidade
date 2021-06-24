@@ -19,6 +19,14 @@ Config.adddefaultsection('identidade')
 Config.setdefaults('identidade', {'level': 0, 'volume': 100, 'spf': 1 / 30, 'high_score': 0})
 
 
+class Dialog(MDDialog):
+    # auto_dismiss do not have effect on ESC functionality
+    def _handle_keyboard(self, window, key, *largs):
+        if key == 27:
+            self.dismiss()
+            return True
+
+
 class Manager(ScreenManager):
     pass
 
@@ -151,7 +159,7 @@ class Game(Screen):
                     button.bind(on_release=dismiss_dialog)
                 buttons.append(button)
         app.dialog_button = buttons[-1]
-        self.dialog = MDDialog(auto_dismiss=False, buttons=buttons, **info)
+        self.dialog = Dialog(auto_dismiss=False, buttons=buttons, **info)
         self.dialog.bind(on_dismiss=self.dismissed_dialog)
         self.dialog.open()
 
@@ -271,7 +279,7 @@ class Identidade(MDApp):
 
     def keyboard_handler(self, window, key, *args):
         if key == 27:  # ESC or back button
-            if root.current == 'game' and not isinstance(app.root_window.children[0], MDDialog):
+            if root.current == 'game' and not isinstance(app.root_window.children[0], Dialog):
                 game.pause()
                 return True
         elif key == 32:  # space
