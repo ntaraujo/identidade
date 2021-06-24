@@ -44,11 +44,9 @@ Manager:
     game_height: self.height_gap + self.height
     MDBoxLayout:
         orientation: 'vertical'
-        Widget:
-            size_hint_y: 1 / 6
+        Widget
         MDBoxLayout:
             orientation: 'vertical'
-            adaptive_height: True
             MDLabel:
                 text: 'Placar: ' + str(int(root.score))
                 halign: 'center'
@@ -57,7 +55,8 @@ Manager:
                 text: 'Nível: ' + str(int(root.level))
                 halign: 'center'
                 font_style: 'Subtitle1'
-        Widget
+        Widget:
+            size_hint_y: 3
     MDFloatLayout:
         Player:
             size_hint: None, None
@@ -72,7 +71,6 @@ Manager:
         Widget
         MDBoxLayout:
             orientation: 'vertical'
-            adaptive_height: True
             MDLabel:
                 text: 'Fim de Jogo'
                 halign: 'center'
