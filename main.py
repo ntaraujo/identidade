@@ -11,6 +11,7 @@ from kivy.core.audio import SoundLoader
 from kivymd.uix.button import MDRectangleFlatButton
 from kivymd.uix.dialog import MDDialog
 from json import load
+from webbrowser import open as web_open
 
 
 class Manager(ScreenManager):
@@ -39,6 +40,7 @@ class Game(Screen):
         if self.music:
             self.music.loop = True
             self.music.play()
+        self.dialog = None
         super().__init__(**kw)
 
     def next_level(self, obstacle_running=True):
@@ -105,17 +107,35 @@ class Game(Screen):
 
     def show_dialog(self, *args):
         self.stop_and_clear()
-        button = MDRectangleFlatButton(text="Peguei!")
         try:
-            dialog = MDDialog(buttons=[button], **self.dialogs[self.level])
-        except IndexError:
-            self.dismiss_dialog()  # no more dialogs
+            info = self.dialogs[self.level].copy()
+        except IndexError:  # no more dialogs
+            self.play(obstacle=False)
+            self.next_level(obstacle_running=False)
+            return
+
+        btns_info = info.pop("buttons", None)
+        if btns_info is None:
+            button = MDRectangleFlatButton(text="Peguei!")
+            button.bind(on_release=self.dismiss_dialog)
+            buttons = [button]
         else:
-            button.bind(on_release=dialog.dismiss)
-            dialog.bind(on_dismiss=self.dismiss_dialog)
-            dialog.open()
+            buttons = []
+            for btn_info in btns_info:
+                button = MDRectangleFlatButton(text=btn_info['text'])
+                if 'link' in btn_info:
+
+                    def open_button_link(_, link=btn_info['link']):
+                        web_open(link)
+                    button.bind(on_release=open_button_link)
+                else:
+                    button.bind(on_release=self.dismiss_dialog)
+                buttons.append(button)
+        self.dialog = MDDialog(buttons=buttons, **info)
+        self.dialog.open()
 
     def dismiss_dialog(self, *args):
+        self.dialog.dismiss()
         self.play(obstacle=False)
         self.next_level(obstacle_running=False)
 

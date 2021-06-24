@@ -18,5 +18,18 @@
   {
     "title": "Eu sou... para a glória de Deus",
     "text": "Cresçam, porém, na graça e no conhecimento de nosso Senhor e Salvador Jesus Cristo. A ele seja a glória, agora e para sempre! Amém.\n\n2 Pedro 3:18"
+  },
+  {
+    "title": "Eu terminei o jogo",
+    "text": "Parabéns! Essa foi a última mensagem. Você pode continuar jogando ou visitar a gente no Instagram",
+    "buttons": [
+      {
+        "text": "Visitar @mensa.geiros",
+        "link": "https://www.instagram.com/mensa.geiros/"
+      },
+      {
+        "text": "Continuar"
+      }
+    ]
   }
 ]
