@@ -3,7 +3,7 @@ from kivy import Config
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, DictProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -14,9 +14,8 @@ from kivymd.uix.dialog import MDDialog
 from json import load
 from webbrowser import open as web_open
 
-
 Config.adddefaultsection('identidade')
-Config.setdefaults('identidade', {'level': 0, 'volume': 100, 'spf': 1 / 30, 'high_score': 0})
+Config.setdefaults('identidade', {'volume': 100, 'fps': 30, 'high_score': 0})
 
 
 class Dialog(MDDialog):
@@ -33,9 +32,9 @@ class Manager(ScreenManager):
 
 class Game(Screen):
     obstacles = []
-    score = NumericProperty(0)
-    level = NumericProperty(Config.getint('identidade', 'level'))
-    spf = NumericProperty(Config.getfloat('identidade', 'spf'))
+    score = NumericProperty()
+    level = NumericProperty()
+    spf = NumericProperty()
     speed_y_parameter = 5 / 4
     interval = 2
     duration = 3
@@ -52,12 +51,6 @@ class Game(Screen):
     def __init__(self, **kw):
         global game
         game = self
-        self.music = SoundLoader.load('lofi.mp3')
-        if self.music:
-            self.music.loop = True
-            self.music.play()
-        else:
-            print('[identidade] lofi.mp3 not found')
         self.dialog = None
         super().__init__(**kw)
 
@@ -154,6 +147,7 @@ class Game(Screen):
 
                     def open_button_link(_, link=btn_info['link']):
                         web_open(link)
+
                     button.bind(on_release=open_button_link)
                 else:
                     button.bind(on_release=dismiss_dialog)
@@ -177,7 +171,7 @@ class Game(Screen):
 
     def game_over(self):
         self.stop_and_clear()
-        game_over.high_score = max(game_over.high_score, self.score)
+        app.settings['high_score'] = max(app.settings['high_score'], self.score)
         root.current = 'game_over'
 
     def pause(self):
@@ -230,8 +224,6 @@ class Menu(Screen):
 
 
 class GameOver(Screen):
-    high_score = NumericProperty(Config.getfloat('identidade', 'high_score'))
-
     def __init__(self, **kw):
         global game_over
         game_over = self
@@ -248,7 +240,7 @@ class Pause(Screen):
         super().__init__(**kw)
 
 
-class Settings(Screen):
+class Setting(Screen):
     pass
 
 
@@ -270,6 +262,25 @@ class Obstacle(Widget):
 
 class Identidade(MDApp):
     dialog_button = None
+    settings = DictProperty({
+        'volume': Config.getfloat('identidade', 'volume'),
+        'fps': Config.getfloat('identidade', 'fps'),
+        'high_score': Config.getfloat('identidade', 'high_score')
+    })
+
+    def __init__(self, **kwargs):
+        self.music = SoundLoader.load('lofi.mp3')
+        if self.music:
+            self.music.loop = True
+            self.music.play()
+        else:
+            print('[identidade] lofi.mp3 not found')
+
+            class FakeMusic:
+                volume = 100
+
+            self.music = FakeMusic()
+        super().__init__(**kwargs)
 
     def build(self):
         global root
@@ -281,6 +292,9 @@ class Identidade(MDApp):
         if key == 27:  # ESC or back button
             if root.current == 'game' and not isinstance(app.root_window.children[0], Dialog):
                 game.pause()
+                return True
+            elif root.current == 'setting':
+                root.current = 'menu'
                 return True
         elif key == 32:  # space
             if root.current == 'game':
@@ -297,9 +311,18 @@ class Identidade(MDApp):
                 self.dialog_button = None
 
     def on_pause(self):
+        self.save()
         if root.current == 'game':
             game.pause()
         return True
+
+    def on_stop(self):
+        self.save()
+
+    def save(self):
+        Config.setall('identidade', self.settings)
+        Config.write()
+        print('[identidade] Settings saved')
 
 
 if __name__ in ('__main__', '__android__'):
