@@ -104,13 +104,13 @@ class Game(Screen):
                 self.game_over()
 
     def show_dialog(self, *args):
+        self.stop_and_clear()
         button = MDRectangleFlatButton(text="Peguei!")
         try:
             dialog = MDDialog(buttons=[button], **self.dialogs[self.level])
         except IndexError:
-            self.next_level()  # no more dialogs
+            self.dismiss_dialog()  # no more dialogs
         else:
-            self.stop_and_clear()
             button.bind(on_release=dialog.dismiss)
             dialog.bind(on_dismiss=self.dismiss_dialog)
             dialog.open()
