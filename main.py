@@ -220,6 +220,9 @@ class Identidade(MDApp):
         root = self.root
         self.theme_cls.theme_style = "Dark"
 
+    def on_pause(self):
+        return True
+
 
 if __name__ in ('__main__', '__android__'):
     app = Identidade()
