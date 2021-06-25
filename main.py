@@ -298,7 +298,7 @@ class Identidade(MDApp):
             if root.current == 'game' and not isinstance(app.root_window.children[0], Dialog):
                 game.pause()
                 return True
-            elif root.current == 'setting':
+            elif root.current in ('setting', 'tutorial'):
                 root.current = 'menu'
                 return True
         elif key == 32:  # space

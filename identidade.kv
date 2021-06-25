@@ -18,12 +18,15 @@ Manager:
     MDBoxLayout:
         orientation: 'vertical'
         Widget
-        MDLabel:
-            text: 'Identidade'
-            halign: 'center'
-            font_style: 'H2'
-            theme_text_color: "Custom"
-            text_color: app.theme_cls.primary_color
+        MDBoxLayout:
+            orientation: 'vertical'
+            MDLabel:
+                text: 'Identidade'
+                halign: 'center'
+                font_style: 'H2'
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+            Widget
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
