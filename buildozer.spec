@@ -13,7 +13,7 @@ package.domain = com.nathan.identidade
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,json,mp3
+source.include_exts = py,png,jpg,kv,atlas,json,ogg
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png

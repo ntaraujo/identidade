@@ -273,13 +273,13 @@ class Identidade(MDApp):
     })
 
     def __init__(self, **kwargs):
-        self.music = SoundLoader.load('lofi.mp3')
+        self.music = SoundLoader.load('lofi.ogg')
         if self.music:
             self.music.loop = True
             self.music.volume = self.settings['volume'] / 100
             self.music.play()
         else:
-            print('[identidade] lofi.mp3 not found')
+            print('[identidade] lofi.ogg not worked')
 
             class FakeMusic:
                 volume = 100
