@@ -164,6 +164,10 @@ Manager:
                 on_value:
                     app.settings['volume'] = self.value
                     app.music.volume = self.value / 100
+            MDIconButton:
+                icon: 'reload'
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_release: app.to_default('volume')
         MDBoxLayout:
             MDLabel:
                 text: 'FPS'
@@ -172,6 +176,10 @@ Manager:
             MDSlider:
                 value: app.settings['fps']
                 on_value: app.settings['fps'] = self.value
+            MDIconButton:
+                icon: 'reload'
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_release: app.to_default('fps')
         MDBoxLayout:
             MDLabel:
                 text: 'Tema Escuro'
@@ -181,8 +189,12 @@ Manager:
                 anchor_x: 'center'
                 anchor_y: 'center'
                 MDSwitch:
-                    active: app.theme_cls.theme_style == "Dark"
+                    active: app.settings['theme_style'] == "Dark"
                     on_active: app.settings['theme_style'] = app.theme_cls.theme_style = "Dark" if self.active else "Light"
+            MDIconButton:
+                icon: 'reload'
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_release: app.to_default('theme_style')
         MDBoxLayout:
             AnchorLayout:
                 anchor_x: 'center'

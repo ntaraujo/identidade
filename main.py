@@ -14,13 +14,14 @@ from kivymd.uix.dialog import MDDialog
 from json import load
 from webbrowser import open as web_open
 
-Config.adddefaultsection('identidade')
-Config.setdefaults('identidade', {
+default_settings = {
     'volume': 100,
     'fps': 30,
     'high_score': 0,
     'theme_style': 'Dark'
-})
+}
+Config.adddefaultsection('identidade')
+Config.setdefaults('identidade', default_settings)
 
 
 class Dialog(MDDialog):
@@ -337,6 +338,9 @@ class Identidade(MDApp):
         Config.setall('identidade', self.settings)
         Config.write()
         print('[identidade] Settings saved')
+
+    def to_default(self, option):
+        self.settings[option] = default_settings[option]
 
 
 if __name__ in ('__main__', '__android__'):
