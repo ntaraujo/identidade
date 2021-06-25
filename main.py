@@ -279,9 +279,7 @@ class Identidade(MDApp):
         'volume': Config.getfloat('identidade', 'volume'),
         'fps': Config.getfloat('identidade', 'fps'),
         'high_score': Config.getfloat('identidade', 'high_score'),
-        'theme_style': Config.get('identidade', 'theme_style'),
-        'primary_palette': Config.get('identidade', 'primary_palette'),
-        'accent_palette': Config.get('identidade', 'accent_palette')
+        'theme_style': Config.get('identidade', 'theme_style')
     })
 
     def __init__(self, **kwargs):
