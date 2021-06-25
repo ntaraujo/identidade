@@ -244,6 +244,10 @@ class Setting(Screen):
     pass
 
 
+class Tutorial(Screen):
+    pass
+
+
 class Obstacle(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -272,6 +276,7 @@ class Identidade(MDApp):
         self.music = SoundLoader.load('lofi.mp3')
         if self.music:
             self.music.loop = True
+            self.music.volume = self.settings['volume'] / 100
             self.music.play()
         else:
             print('[identidade] lofi.mp3 not found')

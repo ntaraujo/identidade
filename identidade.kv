@@ -11,6 +11,8 @@ Manager:
         name: 'pause'
     Setting:
         name: 'setting'
+    Tutorial:
+        name: 'tutorial'
 
 <Menu>:
     MDBoxLayout:
@@ -28,6 +30,12 @@ Manager:
             MDRectangleFlatButton:
                 text: 'Começar'
                 on_release: app.root.current = 'game'
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Como Jogar?'
+                on_release: app.root.current = 'tutorial'
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
@@ -63,7 +71,7 @@ Manager:
                 halign: 'center'
                 font_style: 'Subtitle1'
         Widget:
-            size_hint_y: 2
+            size_hint_y: 3
     MDFloatLayout:
         Player:
             size_hint: None, None
@@ -106,6 +114,7 @@ Manager:
                 on_release: app.root.current = 'menu'
                 text_color: app.theme_cls.accent_color
                 line_color: app.theme_cls.accent_color
+        Widget
 
 <Pause>:
     MDBoxLayout:
@@ -137,6 +146,7 @@ Manager:
             MDRectangleFlatButton:
                 text: 'Menu'
                 on_release: app.root.current = 'menu'
+        Widget
 
 <Setting>:
     MDBoxLayout:
