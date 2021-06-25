@@ -226,28 +226,36 @@ Manager:
 <Tutorial>:
     MDCarousel:
         direction: 'right'
-        TutorialSlide
-        TutorialSlide
+        TutorialSlide:
+            title: 'Primeira descida'
+            text: 'Quando começar o jogo, vai perceber que a bola sobe e logo desce, e então você perde :/\nClique na tela antes da bolinha atingir o chão do celular!'
+        TutorialSlide:
+            title: 'Pulando certo'
+            text: 'Clicando na tela, a bolinha vai pular de um lado, e então de outro. O segredo é sempre clicar nos momentos certos, e controlar o rumo dela'
         TutorialSlide
         TutorialSlide
         TutorialSlide
         TutorialSlide
 
 <TutorialSlide@MDBoxLayout>:
+    color: app.theme_cls.accent_color
+    title: 'Lorem ipsum dolor sit amet'
+    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae dolor non quam blandit aliquet.'
     orientation: 'vertical'
+    padding: '20dp'
     MDLabel:
-        text: 'teste'
+        text: root.title
         halign: 'center'
-        font_style: 'H2'
+        font_style: 'H3'
         theme_text_color: "Custom"
-        text_color: app.theme_cls.primary_color
+        text_color: root.color
     MDLabel:
         size_hint_y: 2
-        text: 'teste'
+        text: root.text
         halign: 'center'
         font_style: 'Subtitle1'
         theme_text_color: "Custom"
-        text_color: app.theme_cls.primary_color
+        text_color: root.color
     MDBoxLayout:
         size_hint_y: 1 / 2
         AnchorLayout:
@@ -256,18 +264,24 @@ Manager:
             MDIconButton:
                 icon: 'arrow-left-bold'
                 on_release: root.parent.parent.load_previous()
+                theme_text_color: "Custom"
+                text_color: root.color
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
             MDRectangleFlatButton:
                 text: 'Voltar ao Menu'
                 on_release: app.root.current = 'menu'
+                text_color: root.color
+                line_color: root.color
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
             MDIconButton:
                 icon: 'arrow-right-bold'
                 on_release: root.parent.parent.load_next()
+                theme_text_color: "Custom"
+                text_color: root.color
 
 <Obstacle>:
     color: app.theme_cls.accent_color
