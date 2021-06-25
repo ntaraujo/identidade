@@ -185,6 +185,8 @@ Manager:
             MDSlider:
                 value: app.settings['fps']
                 on_value: app.settings['fps'] = self.value
+                min: 15
+                max: 90
             MDIconButton:
                 icon: 'reload'
                 pos_hint: {'center_x': .5, 'center_y': .5}
