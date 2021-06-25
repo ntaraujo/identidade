@@ -221,7 +221,53 @@ Manager:
                     text: 'Voltar ao Menu'
                     on_release: app.root.current = 'menu'
 
-<Obstacle>
+<Tutorial>:
+    MDCarousel:
+        direction: 'right'
+        TutorialSlide
+        TutorialSlide
+        TutorialSlide
+        TutorialSlide
+        TutorialSlide
+        TutorialSlide
+
+<TutorialSlide@MDBoxLayout>:
+    orientation: 'vertical'
+    MDLabel:
+        text: 'teste'
+        halign: 'center'
+        font_style: 'H2'
+        theme_text_color: "Custom"
+        text_color: app.theme_cls.primary_color
+    MDLabel:
+        size_hint_y: 2
+        text: 'teste'
+        halign: 'center'
+        font_style: 'Subtitle1'
+        theme_text_color: "Custom"
+        text_color: app.theme_cls.primary_color
+    MDBoxLayout:
+        size_hint_y: 1 / 2
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDIconButton:
+                icon: 'arrow-left-bold'
+                on_release: root.parent.parent.load_previous()
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDRectangleFlatButton:
+                text: 'Voltar ao Menu'
+                on_release: app.root.current = 'menu'
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDIconButton:
+                icon: 'arrow-right-bold'
+                on_release: root.parent.parent.load_next()
+
+<Obstacle>:
     color: app.theme_cls.accent_color
     canvas:
         Color:
