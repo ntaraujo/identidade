@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#:import Clock kivy.clock.Clock
 Manager:
     Menu:
         name: 'menu'
@@ -152,6 +152,15 @@ Manager:
         Widget
 
 <Setting>:
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'bottom'
+        MDProgressBar:
+            id: progress
+            type: "determinate"
+            running_duration: .3
+            catching_duration: 1
+            size_hint_y: .1
     MDBoxLayout:
         orientation: 'vertical'
         MDBoxLayout:
@@ -201,7 +210,10 @@ Manager:
                 anchor_y: 'center'
                 MDRectangleFlatButton:
                     text: 'Salvar'
-                    on_release: app.save()
+                    on_release:
+                        progress.start()
+                        app.save()
+                        Clock.schedule_once(lambda *_: progress.stop(), .4)
             AnchorLayout:
                 anchor_x: 'center'
                 anchor_y: 'center'

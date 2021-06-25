@@ -14,6 +14,9 @@ from kivymd.uix.dialog import MDDialog
 from json import load
 from webbrowser import open as web_open
 
+from kivymd.uix.progressbar import MDProgressBar
+
+MDProgressBar
 default_settings = {
     'volume': 100,
     'fps': 30,
