@@ -328,7 +328,7 @@ class Identidade(MDApp):
 
     def on_pause(self):
         self.save()
-        if root.current == 'game':
+        if root.current == 'game' and not isinstance(app.root_window.children[0], Dialog):
             game.pause()
         return True
 
