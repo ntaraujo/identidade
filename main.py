@@ -15,7 +15,12 @@ from json import load
 from webbrowser import open as web_open
 
 Config.adddefaultsection('identidade')
-Config.setdefaults('identidade', {'volume': 100, 'fps': 30, 'high_score': 0})
+Config.setdefaults('identidade', {
+    'volume': 100,
+    'fps': 30,
+    'high_score': 0,
+    'theme_style': 'Dark'
+})
 
 
 class Dialog(MDDialog):
@@ -269,7 +274,10 @@ class Identidade(MDApp):
     settings = DictProperty({
         'volume': Config.getfloat('identidade', 'volume'),
         'fps': Config.getfloat('identidade', 'fps'),
-        'high_score': Config.getfloat('identidade', 'high_score')
+        'high_score': Config.getfloat('identidade', 'high_score'),
+        'theme_style': Config.get('identidade', 'theme_style'),
+        'primary_palette': Config.get('identidade', 'primary_palette'),
+        'accent_palette': Config.get('identidade', 'accent_palette')
     })
 
     def __init__(self, **kwargs):
@@ -290,7 +298,8 @@ class Identidade(MDApp):
     def build(self):
         global root
         root = self.root
-        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.theme_style = self.settings['theme_style']
+
         Window.bind(on_keyboard=self.keyboard_handler)
 
     def keyboard_handler(self, window, key, *args):

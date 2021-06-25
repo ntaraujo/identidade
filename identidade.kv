@@ -173,6 +173,17 @@ Manager:
                 value: app.settings['fps']
                 on_value: app.settings['fps'] = self.value
         MDBoxLayout:
+            MDLabel:
+                text: 'Tema Escuro'
+                halign: 'center'
+                size_hint_x: 1/3
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
+                MDSwitch:
+                    active: app.theme_cls.theme_style == "Dark"
+                    on_active: app.settings['theme_style'] = app.theme_cls.theme_style = "Dark" if self.active else "Light"
+        MDBoxLayout:
             AnchorLayout:
                 anchor_x: 'center'
                 anchor_y: 'center'
