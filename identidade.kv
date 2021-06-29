@@ -223,18 +223,18 @@ Manager:
                 anchor_x: 'center'
                 anchor_y: 'center'
                 MDRectangleFlatButton:
+                    text: 'Voltar ao Menu'
+                    on_release: app.root.current = 'menu'
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
+                MDRectangleFlatButton:
                     id: save_button
                     text: 'Salvar'
                     on_release:
                         progress.start()
                         app.save()
                         Clock.schedule_once(lambda *_: progress.stop(), .4)
-            AnchorLayout:
-                anchor_x: 'center'
-                anchor_y: 'center'
-                MDRectangleFlatButton:
-                    text: 'Voltar ao Menu'
-                    on_release: app.root.current = 'menu'
 
 <Obstacle>:
     color: app.theme_cls.accent_color
