@@ -3,7 +3,7 @@ from kivy import Config
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.properties import NumericProperty, DictProperty
+from kivy.properties import NumericProperty, DictProperty, BooleanProperty, StringProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -14,13 +14,10 @@ from kivymd.uix.dialog import MDDialog
 from json import load
 from webbrowser import open as web_open
 
-from kivymd.uix.progressbar import MDProgressBar
-
-MDProgressBar
 default_settings = {
     'volume': 100,
     'fps': 30,
-    'high_score': 0,
+    'high_status': 0,
     'theme_style': 'Dark'
 }
 Config.adddefaultsection('identidade')
@@ -53,9 +50,18 @@ class Game(Screen):
     game_width = NumericProperty()
     random_obstacle = None
     paused = False
+    loses = NumericProperty()
+    status = NumericProperty()
+    playing = False
 
     with open('dialogs.json', 'r', encoding='utf-8') as dialogs:
         dialogs = load(dialogs)
+
+    with open('tutorial.json', 'r', encoding='utf-8') as tutorial:
+        tutorial = load(tutorial)
+    tutorial_step = 0
+
+    message = StringProperty(tutorial[0])
 
     def __init__(self, **kw):
         global game
@@ -65,28 +71,37 @@ class Game(Screen):
 
     def next_level(self, obstacle_running=True):
         self.level += 1
-        self.duration -= self.duration / 8
-        self.speed_y_parameter -= self.speed_y_parameter / 8
+
+        if not app.tutorial:
+            self.duration -= self.duration / 8
+            self.speed_y_parameter -= self.speed_y_parameter / 8
+
+            if obstacle_running:
+                Clock.unschedule(self.put_obstacle, self.interval)
+            self.interval -= self.interval / 8
+            Clock.schedule_interval(self.put_obstacle, self.interval)
+
         speed_y = self.height * self.speed_y_parameter
         player.speed_y = speed_y if player.speed_y >= 0 else -speed_y
-
-        if obstacle_running:
-            Clock.unschedule(self.put_obstacle, self.interval)
-        self.interval -= self.interval / 8
-        Clock.schedule_interval(self.put_obstacle, self.interval)
 
     def on_enter(self, *args):
         if not self.paused:
             player.speed_y = self.height * self.speed_y_parameter
             player.speed_x = self.width * 0.75
+            if app.tutorial:
+                Animation(center=self.center, d=1).start(player)
+            else:
+                new_pos = self.width * 0.9, self.height / 20
+                Animation(pos=(self.width * 0.9, self.height / 20), d=1).start(player)
+                Clock.schedule_once(self.play, 1.2)
         else:
             self.paused = False
-        self.play()
 
-    def play(self, obstacle=True):
+    def play(self, *args, obstacle=True):
         Clock.schedule_interval(self.update, self.spf)
         if obstacle:
             Clock.schedule_interval(self.put_obstacle, self.interval)
+        self.playing = True
 
     def put_obstacle(self, *args):
         gap = self.width / 2
@@ -101,37 +116,77 @@ class Game(Screen):
 
     def on_pre_enter(self, *args):
         if not self.paused:
-            player.x = self.width * 0.9
-            player.y = self.height / 20
             self.score = 0
             self.level = 0
+            self.loses = 0
             self.speed_y_parameter = 5 / 4
             self.interval = 2
             self.duration = 3
         else:
             self.paused = False
 
+        if app.tutorial:
+            self.tutorial_step = 0
+            self.message = self.tutorial[0]
+            Clock.schedule_interval(self.update_tutorial, 6)
+
+    def update_tutorial(self, *args):
+        self.tutorial_step += 1
+        if self.tutorial_step == 4:
+            Clock.schedule_interval(self.put_obstacle, self.interval)
+        try:
+            self.message = self.tutorial[self.tutorial_step]
+        except IndexError:
+            pass
+
+
     def update(self, *args):
         player.speed_y += -self.height * 4 * self.spf
         player.y += player.speed_y * self.spf
         player.x -= player.speed_x * self.spf
-        if not -self.height_gap < player.y < self.game_height or not -self.width_gap < player.x < self.game_width:
-            self.game_over()
-        else:
-            ob = self.obstacle_collided()
-            if ob is None:
-                return
-            elif ob == self.random_obstacle:
-                ob.color = app.theme_cls.accent_color
-                self.random_obstacle = None
-                if player.speed_y < 0:
-                    player.speed_y *= -1
+        in_edges = True
+        if app.tutorial:
+            if -self.height_gap > player.y:
+                player.y = -self.height_gap
+                player.jump(horizontal=False)
+            elif player.y + player.height > self.game_height:
+                player.y = self.game_height - player.height
+            elif -self.width_gap > player.x:
+                player.x = -self.width_gap
                 player.speed_x *= -1
-                self.show_dialog()
+            elif player.x + player.width > self.game_width:
+                player.x = self.game_width - player.width
+                player.speed_x *= -1
             else:
-                self.game_over()
+                in_edges = False
+        elif -self.height_gap < player.y < self.game_height and -self.width_gap < player.x < self.game_width:
+            in_edges = False
+
+        if in_edges:
+            self.game_over()
+            return
+
+        ob = self.obstacle_collided()
+        if ob is None:
+            return
+        elif ob == self.random_obstacle:
+            ob.color = app.theme_cls.accent_color
+            self.random_obstacle = None
+            self.show_dialog()
+        elif not ob.collided:
+            self.game_over()
+
+        if not ob.collided:
+            ob.collided = True
+            if player.speed_y < 0:
+                player.speed_y *= -1
+            player.speed_x *= -1
 
     def show_dialog(self, *args):
+        if app.tutorial:
+            self.next_level()
+            return
+
         self.stop_and_clear()
         try:
             info = self.dialogs[self.level].copy()
@@ -173,21 +228,29 @@ class Game(Screen):
     def stop_and_clear(self):
         Clock.unschedule(self.update, self.spf)
         Clock.unschedule(self.put_obstacle, self.interval)
+        Clock.unschedule(self.update_tutorial, 6)
         for ob in self.obstacles:
             ob.anim.cancel(ob)
             self.remove_widget(ob)
         self.obstacles = []
+        self.playing = False
 
     def game_over(self):
+        if app.tutorial:
+            self.loses += 1
+            return
+
         self.stop_and_clear()
-        app.settings['high_score'] = max(app.settings['high_score'], self.score)
+        app.settings['high_status'] = max(app.settings['high_status'], self.status)
         root.current = 'game_over'
 
     def pause(self):
         self.stop_and_clear()
         self.paused = True
-        pause.game_score = self.score
-        pause.game_level = self.level
+        # noqas bcs pause global variable has the same name as this function
+        pause.ids.title.text = str(int(self.status))  # noqa
+        pause.ids.title.text_color = app.theme_cls.error_color if self.status < 0 else app.theme_cls.primary_color  # noqa
+        pause.ids.subtitle.text = ''  # noqa
         root.current = 'pause'
 
     def obstacle_collided(self):
@@ -197,10 +260,17 @@ class Game(Screen):
         return None
 
     def on_touch_down(self, touch):
-        player.jump()
+        if app.tutorial and player.center == game.center:
+            Clock.schedule_interval(self.update, self.spf)
+            self.playing = True
+        if self.playing:
+            player.jump()
         return super().on_touch_down(touch)
 
     def obstacle_choice(self):
+        if app.tutorial and self.tutorial_step < 8:
+            return
+
         # heavy, looks like there is only one possible obstacle
         obs = iter(self.obstacles)
         c = randrange(0, int(len(self.obstacles) / 2))
@@ -223,13 +293,17 @@ class Player(Widget):
         player = self
         super().__init__(**kwargs)
 
-    def jump(self):
+    def jump(self, horizontal=True):
         self.speed_y = game.height
-        self.speed_x *= -1
+        if horizontal:
+            self.speed_x *= -1
 
 
 class Menu(Screen):
-    pass
+    def on_enter(self, *args):
+        if app.tutorial:
+            game.paused = False
+        app.tutorial = False
 
 
 class GameOver(Screen):
@@ -240,9 +314,6 @@ class GameOver(Screen):
 
 
 class Pause(Screen):
-    game_score = NumericProperty()
-    game_level = NumericProperty()
-
     def __init__(self, **kw):
         global pause
         pause = self
@@ -253,11 +324,9 @@ class Setting(Screen):
     pass
 
 
-class Tutorial(Screen):
-    pass
-
-
 class Obstacle(Widget):
+    collided = BooleanProperty(False)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.anim = Animation(y=-self.height, duration=game.duration)
@@ -278,16 +347,17 @@ class Identidade(MDApp):
     settings = DictProperty({
         'volume': Config.getfloat('identidade', 'volume'),
         'fps': Config.getfloat('identidade', 'fps'),
-        'high_score': Config.getfloat('identidade', 'high_score'),
+        'high_status': Config.getfloat('identidade', 'high_status'),
         'theme_style': Config.get('identidade', 'theme_style')
     })
+    tutorial = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         self.music = SoundLoader.load('lofi.ogg')
         if self.music:
             self.music.loop = True
             self.music.volume = self.settings['volume'] / 100
-            self.music.play()
+            self.music.play()  # noqa pycharm says it is FakeMusic here
         else:
             print('[identidade] lofi.ogg not worked')
 

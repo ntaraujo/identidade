@@ -11,14 +11,14 @@ Manager:
         name: 'pause'
     Setting:
         name: 'setting'
-    Tutorial:
-        name: 'tutorial'
 
 <Menu>:
     MDBoxLayout:
         orientation: 'vertical'
         Widget
         MDBoxLayout:
+            padding: '10dp'
+            spacing: '30dp'
             orientation: 'vertical'
             MDLabel:
                 text: 'Identidade'
@@ -38,7 +38,9 @@ Manager:
             anchor_y: 'center'
             MDRectangleFlatButton:
                 text: 'Como Jogar?'
-                on_release: app.root.current = 'tutorial'
+                on_release:
+                    app.tutorial = True
+                    app.root.current = 'game'
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
@@ -56,25 +58,32 @@ Manager:
 
 <Game>:
     spf: 1 / app.settings['fps']
-    height_gap: self.height / 5
-    game_height: self.height_gap + self.height
-    width_gap: self.width / 5
-    game_width: self.width_gap + self.width
+    height_gap: 0 if app.tutorial else self.height / 5
+    game_height: self.height if app.tutorial else self.height_gap + self.height
+    width_gap: 0 if app.tutorial else self.width / 5
+    game_width: self.width if app.tutorial else self.width_gap + self.width
+    score_label: 'Placar: ' + str(int(self.score))
+    level_label: 'Nível: ' + str(int(self.level))
+    status: self.level * 10 + self.score - self.loses
     MDBoxLayout:
         orientation: 'vertical'
         Widget
         MDBoxLayout:
+            padding: '10dp'
+            spacing: '30dp'
             orientation: 'vertical'
             MDLabel:
-                text: 'Placar: ' + str(int(root.score))
+                text: str(int(root.status))  # if app.tutorial else root.score_label
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.error_color if root.status < 0 else app.theme_cls.text_color
                 halign: 'center'
                 font_style: 'H3'
             MDLabel:
-                text: 'Nível: ' + str(int(root.level))
+                text: root.message if app.tutorial else ''  # root.level_label
                 halign: 'center'
                 font_style: 'Subtitle1'
         Widget:
-            size_hint_y: 3
+            size_hint_y: 1 if app.tutorial else 3
     MDFloatLayout:
         Player:
             size_hint: None, None
@@ -88,6 +97,8 @@ Manager:
         orientation: 'vertical'
         Widget
         MDBoxLayout:
+            padding: '10dp'
+            spacing: '30dp'
             orientation: 'vertical'
             MDLabel:
                 text: 'Fim de Jogo'
@@ -96,7 +107,7 @@ Manager:
                 theme_text_color: "Custom"
                 text_color: app.theme_cls.accent_color
             MDLabel:
-                text: 'Maior pontuação: ' + str(int(app.settings['high_score']))
+                text: 'Maior pontuação: ' + str(int(app.settings['high_status']))
                 halign: 'center'
                 font_style: 'Subtitle1'
                 theme_text_color: "Custom"
@@ -124,15 +135,16 @@ Manager:
         orientation: 'vertical'
         Widget
         MDBoxLayout:
+            padding: '10dp'
+            spacing: '30dp'
             orientation: 'vertical'
             MDLabel:
-                text: 'Placar: ' + str(int(root.game_score))
+                id: title
                 halign: 'center'
                 font_style: 'H2'
                 theme_text_color: "Custom"
-                text_color: app.theme_cls.primary_color
             MDLabel:
-                text: 'Nível: ' + str(int(root.game_level))
+                id: subtitle
                 halign: 'center'
                 font_style: 'Subtitle1'
                 theme_text_color: "Custom"
@@ -222,66 +234,6 @@ Manager:
                 MDRectangleFlatButton:
                     text: 'Voltar ao Menu'
                     on_release: app.root.current = 'menu'
-
-<Tutorial>:
-    MDCarousel:
-        direction: 'right'
-        TutorialSlide:
-            title: 'Primeira descida'
-            text: 'Quando começar o jogo, vai perceber que a bola sobe e logo desce, e então você perde :/\nClique na tela antes da bolinha atingir o chão do celular!'
-        TutorialSlide:
-            title: 'Pulando certo'
-            text: 'Clicando na tela, a bolinha vai pular de um lado, e então de outro. O segredo é sempre clicar nos momentos certos, e controlar o rumo dela'
-        TutorialSlide
-        TutorialSlide
-        TutorialSlide
-        TutorialSlide
-
-<TutorialSlide@MDBoxLayout>:
-    color: app.theme_cls.accent_color
-    title: 'Lorem ipsum dolor sit amet'
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vitae dolor non quam blandit aliquet.'
-    orientation: 'vertical'
-    padding: '20dp'
-    MDLabel:
-        text: root.title
-        halign: 'center'
-        font_style: 'H3'
-        theme_text_color: "Custom"
-        text_color: root.color
-    MDLabel:
-        size_hint_y: 2
-        text: root.text
-        halign: 'center'
-        font_style: 'Subtitle1'
-        theme_text_color: "Custom"
-        text_color: root.color
-    MDBoxLayout:
-        size_hint_y: 1 / 2
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            MDIconButton:
-                icon: 'arrow-left-bold'
-                on_release: root.parent.parent.load_previous()
-                theme_text_color: "Custom"
-                text_color: root.color
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            MDRectangleFlatButton:
-                text: 'Voltar ao Menu'
-                on_release: app.root.current = 'menu'
-                text_color: root.color
-                line_color: root.color
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            MDIconButton:
-                icon: 'arrow-right-bold'
-                on_release: root.parent.parent.load_next()
-                theme_text_color: "Custom"
-                text_color: root.color
 
 <Obstacle>:
     color: app.theme_cls.accent_color
