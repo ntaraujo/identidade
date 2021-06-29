@@ -92,11 +92,8 @@ class Game(Screen):
         if not self.paused:
             player.speed_y = self.height * self.speed_y_parameter
             player.speed_x = self.width * 0.75
-            if app.tutorial:
-                Animation(center=self.center, d=1).start(player)
-            else:
-                new_pos = self.width * 0.9, self.height / 20
-                Animation(pos=(self.width * 0.9, self.height / 20), d=1).start(player)
+            Animation(center=self.center, d=1).start(player)
+            if not app.tutorial:
                 Clock.schedule_once(self.play, 1.2)
         else:
             self.paused = False
