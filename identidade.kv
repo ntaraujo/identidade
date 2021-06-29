@@ -153,7 +153,7 @@ Manager:
             anchor_x: 'center'
             anchor_y: 'center'
             MDRectangleFlatButton:
-                text: 'Continuar'
+                text: 'Ver tutorial de novo' if app.tutorial else 'Continuar'
                 on_release: app.root.current = 'game'
         AnchorLayout:
             anchor_x: 'center'

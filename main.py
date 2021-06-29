@@ -249,7 +249,8 @@ class Game(Screen):
 
     def pause(self):
         self.stop_and_clear()
-        self.paused = True
+        if not app.tutorial:
+            self.paused = True
         # noqas bcs pause global variable has the same name as this function
         pause.ids.title.text = str(int(self.status))  # noqa
         pause.ids.title.text_color = app.theme_cls.error_color if self.status < 0 else app.theme_cls.primary_color  # noqa
