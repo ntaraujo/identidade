@@ -13,6 +13,7 @@ from kivymd.uix.button import MDRectangleFlatButton
 from kivymd.uix.dialog import MDDialog
 from json import load
 from webbrowser import open as web_open
+from kivy.utils import platform
 
 default_settings = {
     'volume': 100,
@@ -57,7 +58,10 @@ class Game(Screen):
     with open('dialogs.json', 'r', encoding='utf-8') as dialogs:
         dialogs = load(dialogs)
 
-    with open('tutorial.json', 'r', encoding='utf-8') as tutorial:
+    with open(
+            'tutorial-mobile.json' if platform in ('android', 'ios') else 'tutorial-desktop.json',
+            'r', encoding='utf-8'
+    ) as tutorial:
         tutorial = load(tutorial)
     tutorial_step = 0
 
@@ -138,7 +142,6 @@ class Game(Screen):
             self.message = self.tutorial[self.tutorial_step]
         except IndexError:
             pass
-
 
     def update(self, *args):
         player.speed_y += -self.height * 4 * self.spf
@@ -260,11 +263,7 @@ class Game(Screen):
         return None
 
     def on_touch_down(self, touch):
-        if app.tutorial and player.center == game.center:
-            Clock.schedule_interval(self.update, self.spf)
-            self.playing = True
-        if self.playing:
-            player.jump()
+        player.jump()
         return super().on_touch_down(touch)
 
     def obstacle_choice(self):
@@ -294,6 +293,12 @@ class Player(Widget):
         super().__init__(**kwargs)
 
     def jump(self, horizontal=True):
+        if app.tutorial and self.center == game.center:
+            Clock.schedule_interval(game.update, game.spf)
+            game.playing = True
+        if not game.playing:
+            return
+
         self.speed_y = game.height
         if horizontal:
             self.speed_x *= -1
@@ -379,7 +384,7 @@ class Identidade(MDApp):
             if root.current == 'game' and not isinstance(app.root_window.children[0], Dialog):
                 game.pause()
                 return True
-            elif root.current in ('setting', 'tutorial'):
+            elif root.current in ('setting', 'tutorial', 'game_over'):
                 root.current = 'menu'
                 return True
         elif key == 32:  # space
@@ -391,6 +396,9 @@ class Identidade(MDApp):
                 if root.current in ('menu', 'game_over', 'pause'):
                     root.current = 'game'
                     return True
+                elif root.current == 'setting':
+                    root.current_screen.ids.save_button.dispatch('on_press')
+                    root.current_screen.ids.save_button.dispatch('on_release')
             else:
                 self.dialog_button.dispatch('on_press')
                 self.dialog_button.dispatch('on_release')
