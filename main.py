@@ -267,7 +267,7 @@ class Game(Screen):
         return super().on_touch_down(touch)
 
     def obstacle_choice(self):
-        if app.tutorial and self.tutorial_step < 8:
+        if app.tutorial and self.tutorial_step < 9:
             return
 
         # heavy, looks like there is only one possible obstacle
