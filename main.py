@@ -176,11 +176,11 @@ class Game(Screen):
             ob.color = app.theme_cls.accent_color
             self.random_obstacle = None
             self.show_dialog()
-        elif not ob.collided:
+        elif ob.collided < 5:
             self.game_over()
 
-        if not ob.collided:
-            ob.collided = True
+        if ob.collided < 5:
+            ob.collided += 1
             if player.speed_y < 0:
                 player.speed_y *= -1
             player.speed_x *= -1
@@ -331,7 +331,7 @@ class Setting(Screen):
 
 
 class Obstacle(Widget):
-    collided = BooleanProperty(False)
+    collided = 0
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
