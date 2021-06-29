@@ -1,14 +1,15 @@
 [
-  "Esse é você. Um pouco diferente, azul e circular, mas ainda você",
+  "Esse é você",
   "Você pode pular e chegar a lugares mais altos clicando na tela",
+  "Tente clicar várias vezes seguidas, rápido",
   "Se encostar nas bordas da tela, você perde",
   "Dependendo da velocidade dos cliques, você vai conseguir mudar sua direção",
-  "Agora, essas são as suas dúvidas. Nunca pensou nelas como barras amarelas né?",
-  "Se desvie! No momento que você é atingido, perde também",
-  "Toda dúvida superada é um ponto a mais",
-  "De vez em quando uma dessas dúvidas se tornará boa, e mudará de cor para o azul",
-  "Quando acontecer, acerte-a! Essa dúvida agora é uma resposta",
-  "Acertando a resposta você passa de nível, e uma mensagem aparece",
+  "Agora, se desvie das barras amarelas",
+  "No momento que você é atingido, perde também",
+  "Toda barra superada é um ponto a mais",
+  "De vez em quando uma delas mudará de cor para o azul",
+  "Quando acontecer, acerte essa barra!",
+  "Acertando, você passa de nível",
   "Boa sorte",
-  "Você pode pausar e ir para o jogo real com o botão de voltar"
+  "Pause o tutorial ou vá para o jogo real com o botão de voltar"
 ]

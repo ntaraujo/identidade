@@ -132,11 +132,11 @@ class Game(Screen):
         if app.tutorial:
             self.tutorial_step = 0
             self.message = self.tutorial[0]
-            Clock.schedule_interval(self.update_tutorial, 6)
+            Clock.schedule_interval(self.update_tutorial, 8)
 
     def update_tutorial(self, *args):
         self.tutorial_step += 1
-        if self.tutorial_step == 4:
+        if self.tutorial_step == 5:
             Clock.schedule_interval(self.put_obstacle, self.interval)
         try:
             self.message = self.tutorial[self.tutorial_step]
@@ -231,7 +231,7 @@ class Game(Screen):
     def stop_and_clear(self):
         Clock.unschedule(self.update, self.spf)
         Clock.unschedule(self.put_obstacle, self.interval)
-        Clock.unschedule(self.update_tutorial, 6)
+        Clock.unschedule(self.update_tutorial, 8)
         for ob in self.obstacles:
             ob.anim.cancel(ob)
             self.remove_widget(ob)
