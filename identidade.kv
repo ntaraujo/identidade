@@ -83,7 +83,7 @@ Manager:
                 halign: 'center'
                 font_style: 'Subtitle1'
         Widget:
-            size_hint_y: 1 if app.tutorial else 3
+            size_hint_y: 3  # 1 if app.tutorial else 3
     MDFloatLayout:
         Player:
             size_hint: None, None
@@ -105,7 +105,7 @@ Manager:
                 halign: 'center'
                 font_style: 'H2'
                 theme_text_color: "Custom"
-                text_color: app.theme_cls.accent_color
+                text_color: app.theme_cls.error_color
             MDLabel:
                 text: 'Maior pontuação: ' + str(int(app.settings['high_status']))
                 halign: 'center'
@@ -223,6 +223,7 @@ Manager:
                 anchor_x: 'center'
                 anchor_y: 'center'
                 MDRectangleFlatButton:
+                    id: save_button
                     text: 'Salvar'
                     on_release:
                         progress.start()
