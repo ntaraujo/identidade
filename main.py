@@ -16,7 +16,7 @@ from webbrowser import open as web_open
 from kivy.utils import platform
 
 default_settings = {
-    'volume': 100,
+    'volume': 30,
     'fps': 30,
     'high_status': 0,
     'theme_style': 'Dark'
@@ -106,10 +106,10 @@ class Game(Screen):
 
     def put_obstacle(self, *args):
         gap = self.width / 2
-        position = (self.width - gap) * random()
-        height = self.height * 0.02
-        obstacle_left = Obstacle(y=self.height, width=position, height=height)
-        obstacle_right = Obstacle(y=self.height, x=position + gap, width=self.width - position - gap, height=height)
+        position = (self.game_width - gap) * random()
+        height = self.game_height * 0.02
+        obstacle_left = Obstacle(y=self.game_height, width=position, height=height)
+        obstacle_right = Obstacle(y=self.game_height, x=position + gap, width=self.game_width - position - gap, height=height)
         self.add_widget(obstacle_left)
         self.obstacles.append(obstacle_left)
         self.add_widget(obstacle_right)
